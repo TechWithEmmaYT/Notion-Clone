@@ -5,12 +5,12 @@ export default defineSchema({
   documents: defineTable({
     title: v.string(),
     userId: v.string(),
-    isArchived: v.boolean(),
     parentDocument: v.optional(v.id("documents")),
     content: v.optional(v.string()),
     icon: v.optional(v.string()),
+    isArchived: v.boolean(),
     isPublished: v.boolean(),
-    favoritedBy: v.optional(v.array(v.string())),
+    isFavorite: v.boolean(),
   })
     .index("by_user", ["userId"])
     .index("by_user_parent", ["userId", "parentDocument"]),

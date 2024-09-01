@@ -2,12 +2,30 @@
 import React from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, LucideIcon, Plus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  LinkIcon,
+  LucideIcon,
+  MoreHorizontal,
+  Plus,
+  StarIcon,
+  StarOffIcon,
+  TrashIcon,
+} from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useUser } from "@clerk/clerk-react";
 
 type MenuItemProps = {
   label: string;
@@ -16,10 +34,11 @@ type MenuItemProps = {
   active?: boolean;
   expanded?: boolean;
   isSearch?: boolean;
+  isFavorite?: boolean;
   level?: number;
   paddingLeft?: string;
   onExpand?: () => void;
-  onClick: () => void;
+  onClick?: () => void;
   icon: LucideIcon;
 };
 const MenuItem = ({
@@ -33,10 +52,14 @@ const MenuItem = ({
   onExpand,
   paddingLeft = "12px",
   documentIcon,
+  isFavorite = false,
   onClick,
 }: MenuItemProps) => {
   const router = useRouter();
+  const { user } = useUser();
   const create = useMutation(api.documents.create);
+  const archive = useMutation(api.documents.archive);
+  const favourite = useMutation(api.documents.toggleFavourite);
   const ChevronIcon = expanded ? ChevronDown : ChevronRight;
 
   const handleExpand = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -59,6 +82,31 @@ const MenuItem = ({
       loading: "Creating a new page...",
       success: "New Page Created",
       error: "Failed to create a new page",
+    });
+  };
+
+  const onArchive = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
+    if (!id) return;
+    const response = archive({ id });
+    toast.promise(response, {
+      loading: "Moving to trash...",
+      success: "Moved to trash",
+      error: "Failed to archive page",
+    });
+  };
+
+  const onFavorite = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    isFavorite: boolean
+  ) => {
+    e.stopPropagation();
+    if (!id) return;
+    const response = favourite({ id });
+    toast.promise(response, {
+      loading: `${isFavorite ? "Removing from" : "Adding to"} favorite...`,
+      success: `${isFavorite ? "Removed from" : "Added to"} favorite...`,
+      error: `Failed to ${isFavorite ? "remove" : "add"} favorite`,
     });
   };
 
@@ -109,6 +157,49 @@ const MenuItem = ({
 
       {!!id && (
         <div className=" ml-auto flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <div
+                role="button"
+                className="opacity-0 group-hover:opacity-100 h-full ml-auto
+               rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+              >
+                <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-60"
+              align="start"
+              side="right"
+              forceMount
+            >
+              <DropdownMenuItem
+                className="!cursor-pointer"
+                onClick={(e) => onFavorite(e, isFavorite)}
+              >
+                {isFavorite ? (
+                  <StarOffIcon className="h-4 w-4 mr-2" />
+                ) : (
+                  <StarIcon className="h-4 w-4 mr-2" />
+                )}
+                {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="!cursor-pointer">
+                <LinkIcon className="h-4 w-4 mr-2" />
+                Copy link
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onArchive} className="!cursor-pointer">
+                <TrashIcon className="h-4 w-4 mr-2" />
+                Move to Trash
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <div className="text-xs text-muted-foreground p-2">
+                Last edited by: {user?.fullName}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* { Add Child Page} */}
           <div
             role="button"
             className="opacity-0 group-hover:opacity-100 h-full ml-auto

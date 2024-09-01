@@ -1,20 +1,25 @@
 "use client";
 import React, { Fragment, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { FileIcon, MoreHorizontalIcon } from "lucide-react";
 import { useQuery } from "convex/react";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import MenuItem from "./menu-item";
 import { cn } from "@/lib/utils";
-import { EllipsisIcon, FileIcon } from "lucide-react";
 
 type PropsType = {
   parentDocumentId?: Id<"documents">;
   level?: number;
   data?: Doc<"documents">[];
+  hasFavorite?: boolean;
 };
 
-const DocumentList: React.FC<PropsType> = ({ parentDocumentId, level = 0 }) => {
+const DocumentList: React.FC<PropsType> = ({
+  parentDocumentId,
+  hasFavorite = false,
+  level = 0,
+}) => {
   const params = useParams();
   const router = useRouter();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -28,6 +33,7 @@ const DocumentList: React.FC<PropsType> = ({ parentDocumentId, level = 0 }) => {
 
   const documents = useQuery(api.documents.getDocuments, {
     parentDocument: parentDocumentId,
+    favoriteOnly: hasFavorite,
     limit: 10,
   });
 
@@ -48,6 +54,8 @@ const DocumentList: React.FC<PropsType> = ({ parentDocumentId, level = 0 }) => {
       </>
     );
   }
+
+  console.log(documents);
 
   return (
     <Fragment>
@@ -70,6 +78,7 @@ const DocumentList: React.FC<PropsType> = ({ parentDocumentId, level = 0 }) => {
             icon={FileIcon}
             documentIcon={document.icon}
             active={params.documentId === document._id}
+            isFavorite={document.isFavorite}
             expanded={expanded[document._id]}
             level={level}
             onClick={() => onRedirect(document._id)}
@@ -87,7 +96,7 @@ const DocumentList: React.FC<PropsType> = ({ parentDocumentId, level = 0 }) => {
       {documents?.length === 10 && (
         <MenuItem
           label="More"
-          icon={EllipsisIcon}
+          icon={MoreHorizontalIcon}
           paddingLeft="0px"
           onClick={() => {}}
         />

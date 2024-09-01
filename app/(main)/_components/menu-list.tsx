@@ -6,11 +6,18 @@ import { api } from "@/convex/_generated/api";
 import MenuItem from "./_common/menu-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { File, Home, Inbox, Search, Settings } from "lucide-react";
+import { Home, Inbox, Search, Settings, Trash2, TrashIcon } from "lucide-react";
 import ToolTip from "@/components/tooltip";
 import DocumentList from "./_common/document-list";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import TrashBin from "./_common/trash-bin";
+import SettingDialog from "./_common/setting-dialog";
 
-const MenuList = () => {
+const MenuList = ({ isMobile }: { isMobile: boolean }) => {
   const create = useMutation(api.documents.create);
 
   const onCreate = async () => {
@@ -63,12 +70,9 @@ const MenuList = () => {
             />
           </li>
           <li>
-            <MenuItem
-              onClick={() => {}}
-              label="Settings"
-              icon={Settings}
-              paddingLeft="0px"
-            />
+            <SettingDialog>
+              <MenuItem label="Settings" icon={Settings} paddingLeft="0px" />
+            </SettingDialog>
           </li>
         </ul>
       </div>
@@ -90,22 +94,33 @@ const MenuList = () => {
         <div className="mt-3 px-3">
           <div className="flex items-center justify-between pb-2">
             <h2 className="text-muted-foreground truncate text-[13px] font-medium">
-              Favourite
+              Favorite
             </h2>
-            <div className="flex items-center gap-x-2">
-              <button></button>
-            </div>
           </div>
-          <ul>
-            <li>
-              <MenuItem
-                onClick={() => {}}
-                label="Youtube Script"
-                documentIcon=""
-                icon={File}
-              />
-            </li>
-          </ul>
+          <div className="mt-0">
+            <DocumentList hasFavorite={true} />
+          </div>
+        </div>
+        <div className="mt-2 px-3">
+          <div className="mt-0">
+            <Popover>
+              <PopoverTrigger className="w-full mt-4">
+                <MenuItem
+                  //active={true}
+                  label="Trash"
+                  paddingLeft="0px"
+                  icon={Trash2}
+                />
+              </PopoverTrigger>
+              <PopoverContent
+                className="
+                p-0 pb-1 w-[414px] min-w-[180px] min-h-[40vh]"
+                side={isMobile ? "bottom" : "right"}
+              >
+                <TrashBin />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </ScrollArea>
     </div>
