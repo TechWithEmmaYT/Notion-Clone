@@ -37,7 +37,9 @@ const EmptyDocument = () => {
           className="-ml-7"
         />
         <div className="flex flex-col items-center justify-center">
-          <h2 className="font-medium text-black/80">Create a new page</h2>
+          <h2 className="font-medium text-black/80 dark:text-white/80">
+            Create a new page
+          </h2>
           <Button
             onClick={onCreate}
             disabled={loading}

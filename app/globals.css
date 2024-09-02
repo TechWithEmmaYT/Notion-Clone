@@ -6,6 +6,9 @@ html,
 body {
   height: 100%;
 }
+.cmd-dialog {
+  max-width: 46rem !important;
+}
 
 @layer base {
   :root {

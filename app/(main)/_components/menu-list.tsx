@@ -14,11 +14,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useSearch } from "@/hooks/use-search";
 import TrashBin from "./_common/trash-bin";
 import SettingDialog from "./_common/setting-dialog";
 
 const MenuList = ({ isMobile }: { isMobile: boolean }) => {
   const create = useMutation(api.documents.create);
+  const onOpen = useSearch((store) => store.onOpen);
 
   const onCreate = async () => {
     const response = create({
@@ -40,7 +42,7 @@ const MenuList = ({ isMobile }: { isMobile: boolean }) => {
               label="Search"
               icon={Search}
               paddingLeft="0px"
-              onClick={() => {}}
+              onClick={onOpen}
             />
           </li>
           <li>

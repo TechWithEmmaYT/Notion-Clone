@@ -223,3 +223,23 @@ export const toggleFavourite = mutation({
     return doc;
   },
 });
+
+export const getSearch = query({
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    const userId = identity.subject;
+
+    const docs = await ctx.db
+      .query("documents")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("isArchived"), true))
+
+      .order("desc")
+      .collect();
+
+    return docs;
+  },
+});

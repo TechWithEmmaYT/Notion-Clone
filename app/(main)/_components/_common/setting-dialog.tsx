@@ -11,6 +11,7 @@ import {
   Settings2Icon,
 } from "lucide-react";
 import Settings from "@/components/settings";
+//import { useSettings } from "@/hooks/use-settings";
 
 interface PropsType {
   children: React.ReactNode;
@@ -51,7 +52,7 @@ const SettingDialog: React.FC<PropsType> = ({ children }) => {
                 </div>
               </div>
             </div>
-            <div className="menu-list mt-1">
+            <div className="menu-list mt-1 flex flex-col gap-1">
               <MenuItem
                 label="My settings"
                 icon={Settings2Icon}
